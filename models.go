@@ -1,0 +1,41 @@
+package main
+
+import (
+	"github.com/jinzhu/gorm"
+	// "github.com/jinzhu/gorm/dialects/postgres"
+	"github.com/go-playground/validator/v10"
+)
+
+// DB global GORM var
+var DB *gorm.DB
+
+func initDB() {
+	var err error
+	DB, err = gorm.Open("postgres", "host=localhost port=5432 user=sarimabbas dbname=boop_api sslmode=disable")
+	if err != nil {
+		panic(err)
+	}
+}
+
+func getDB() *gorm.DB {
+	return DB
+}
+
+// User GORM model
+type User struct {
+	gorm.Model
+	Name     string `json:"name"`
+	Email    string `gorm:"type:varchar(100);unique_index" json:"email" validate:"required"`
+	Username string `gorm:"type:varchar(100);unique_index" json:"username" validate:"required"`
+	Password string `json:"password" validate:"required"`
+}
+
+// CustomValidator GORM middleware
+type CustomValidator struct {
+	validator *validator.Validate
+}
+
+// Validate function for GORM
+func (cv *CustomValidator) Validate(i interface{}) error {
+	return cv.validator.Struct(i)
+}
