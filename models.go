@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/jinzhu/gorm"
-	// "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/go-playground/validator/v10"
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
 // DB global GORM var

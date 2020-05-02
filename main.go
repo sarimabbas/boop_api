@@ -3,17 +3,17 @@ package main
 import (
 	// "encoding/json"
 	"github.com/go-playground/validator/v10"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/labstack/echo/v4"
-	"net/http"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 func main() {
+	// setup db
 	initDB()
 	db := getDB()
 	defer db.Close()
 
-	// Migrate the schema
+	// migrate schema
 	db.AutoMigrate(&User{})
 
 	// Init router
@@ -22,23 +22,18 @@ func main() {
 	// add validation
 	e.Validator = &CustomValidator{validator: validator.New()}
 
-	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, World!")
-	})
+	// add JWT middleware
+	r := e.Group("")
+	r.Use(middleware.JWT([]byte("secret")))
 
+	// add routes
+	e.GET("/", welcome)
 	e.GET("/users/:username", getUser)
 	e.POST("/users", createUser)
 	e.GET("/boops", getBoops)
-	e.GET("/login", login)
+	e.POST("/login", login)
+	r.GET("/test", testToken)
 
-	// e.POST("/user", func(c echo.Context) error {
-	// 	return
-	// })
-
-	// 	e.POST("/users", saveUser)
-	// e.GET("/users/:id", getUser)
-	// e.PUT("/users/:id", updateUser)
-	// e.DELETE("/users/:id", deleteUser)
-
+	// start server
 	e.Logger.Fatal(e.Start(":1323"))
 }
