@@ -33,7 +33,7 @@ func main() {
 	e.GET("/boops", getBoops)
 	e.POST("/login", login)
 	r.GET("/test", testToken)
-	r.POST("/boop", sendBoop)
+	r.POST("/boops", sendBoop)
 
 	// start server
 	e.Logger.Fatal(e.Start(":1323"))

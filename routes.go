@@ -110,6 +110,7 @@ func sendBoop(c echo.Context) error {
 	// get receiver
 	type Form struct {
 		Username string `json:"username" validate:"required"`
+		Message  string `json:"message"`
 	}
 	form := new(Form)
 	if err := c.Bind(form); err != nil {
@@ -134,7 +135,7 @@ func sendBoop(c echo.Context) error {
 	}
 
 	// create boop
-	boop := Boop{FromUser: sender, ToUser: recipient}
+	boop := Boop{FromUser: sender, ToUser: recipient, Message: form.Message}
 	db.Create(&boop)
 	return c.JSON(http.StatusCreated, boop)
 }
