@@ -105,7 +105,7 @@ func getBoops(c echo.Context) error {
 	return c.String(http.StatusOK, username+" "+password)
 }
 
-// e.POST("/boop", sendBoops)
+// e.POST("/boops", sendBoops)
 func sendBoop(c echo.Context) error {
 	// get receiver
 	type Form struct {
