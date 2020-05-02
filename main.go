@@ -14,7 +14,7 @@ func main() {
 	defer db.Close()
 
 	// migrate schema
-	db.AutoMigrate(&User{})
+	db.AutoMigrate(&User{}, &Boop{})
 
 	// Init router
 	e := echo.New()
@@ -33,6 +33,7 @@ func main() {
 	e.GET("/boops", getBoops)
 	e.POST("/login", login)
 	r.GET("/test", testToken)
+	r.POST("/boop", sendBoop)
 
 	// start server
 	e.Logger.Fatal(e.Start(":1323"))

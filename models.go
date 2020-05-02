@@ -30,6 +30,16 @@ type User struct {
 	Password string `json:"password" validate:"required"`
 }
 
+// Boop GORM model
+type Boop struct {
+	gorm.Model
+	FromUserID int
+	ToUserID   int
+	FromUser   User `gorm:"foreignkey:FromUserID"`
+	ToUser     User `gorm:"foreignkey:ToUserID"`
+	Message    string
+}
+
 // CustomValidator GORM middleware
 type CustomValidator struct {
 	validator *validator.Validate

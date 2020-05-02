@@ -93,8 +93,8 @@ func login(c echo.Context) error {
 
 // Validate your JWT. If valid, it will be dumped back, else a return
 func testToken(c echo.Context) error {
-	user := c.Get("user")
-	claims := user.(*jwt.Token).Claims.(jwt.MapClaims)
+	token := c.Get("user")
+	claims := token.(*jwt.Token).Claims.(jwt.MapClaims)
 	return c.JSON(http.StatusOK, "Welcome, "+claims["username"].(string))
 }
 
@@ -102,6 +102,39 @@ func testToken(c echo.Context) error {
 func getBoops(c echo.Context) error {
 	username := c.QueryParam("username")
 	password := c.QueryParam("password")
-
 	return c.String(http.StatusOK, username+" "+password)
+}
+
+// e.POST("/boop", sendBoops)
+func sendBoop(c echo.Context) error {
+	// get receiver
+	type Form struct {
+		Username string `json:"username" validate:"required"`
+	}
+	form := new(Form)
+	if err := c.Bind(form); err != nil {
+		return c.String(http.StatusUnprocessableEntity, err.Error())
+	}
+	if err := c.Validate(form); err != nil {
+		return c.String(http.StatusUnprocessableEntity, err.Error())
+	}
+	db := getDB()
+	var recipient User
+	if err := db.Where("username = ?", form.Username).First(&recipient).Error; err != nil {
+		return c.String(http.StatusUnprocessableEntity, err.Error())
+	}
+
+	// get sender
+	token := c.Get("user")
+	claims := token.(*jwt.Token).Claims.(jwt.MapClaims)
+	username := claims["username"].(string)
+	var sender User
+	if err := db.Where("username = ?", username).First(&sender).Error; err != nil {
+		return c.String(http.StatusUnprocessableEntity, err.Error())
+	}
+
+	// create boop
+	boop := Boop{FromUser: sender, ToUser: recipient}
+	db.Create(&boop)
+	return c.JSON(http.StatusCreated, boop)
 }
