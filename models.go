@@ -1,9 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"github.com/go-playground/validator/v10"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"github.com/joho/godotenv"
+	"os"
 )
 
 // DB global GORM var
@@ -11,7 +14,18 @@ var DB *gorm.DB
 
 func initDB() {
 	var err error
-	DB, err = gorm.Open("postgres", "host=localhost port=5432 user=sarimabbas dbname=boop_api sslmode=disable")
+	// DEV MODE
+	if err = godotenv.Load(".env"); err != nil {
+		DB, err = gorm.Open("postgres",
+			fmt.Sprintf("host=%s port=5432 user=%s dbname=%s sslmode=disable",
+				os.Getenv("DB_HOST"), os.Getenv("DB_USER"), os.Getenv("DB_NAME")))
+		if err != nil {
+			panic(err)
+		}
+		return
+	}
+	// PROD MODE
+	DB, err = gorm.Open("postgres", os.Getenv("DATABASE_URL"))
 	if err != nil {
 		panic(err)
 	}
