@@ -5,6 +5,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"os"
 )
 
 func main() {
@@ -36,5 +37,9 @@ func main() {
 	r.POST("/boops", sendBoop)
 
 	// start server
-	e.Logger.Fatal(e.Start(":1323"))
+	port := os.Getenv("PORT")
+	if port == "" {
+		panic("$PORT must be set")
+	}
+	e.Logger.Fatal(e.Start(":" + port))
 }
